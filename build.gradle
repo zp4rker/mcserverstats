@@ -1,0 +1,50 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '1.4.30'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.4.21'
+
+    id 'com.github.johnrengelman.shadow' version '6.1.0'
+}
+
+group 'com.zp4rker'
+version '1.0.0-dev'
+
+def discoreVersion = "1.2.4-release"
+def jdaVersion = "4.2.0_227"
+
+repositories {
+    mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    shadow ("com.zp4rker:discore:$discoreVersion") { transitive = false }
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib"
+    compile "com.zp4rker:discore:$discoreVersion"
+
+    compile "org.mapdb:mapdb:3.0.8"
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = 1.8
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "com.zp4rker.discore.bootstrap.Main"
+        attributes "Class-Path": "lib/"
+
+        attributes "Bot-Main": "com.zp4rker.mcserverstats.MCSSKt"
+        attributes "Implementation-Version": project.version
+
+        attributes "Discore-Version": discoreVersion
+        attributes "JDA-Version": jdaVersion
+    }
+}
+
+shadowJar {
+    archiveClassifier.set("")
+
+    configurations = [project.configurations.shadow]
+}
+build.dependsOn "shadowJar"
