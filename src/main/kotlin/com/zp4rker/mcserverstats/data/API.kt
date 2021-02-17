@@ -25,7 +25,7 @@ object API {
         return if (!data.getBoolean("online")) APIResult("Offline")
         else data.getJSONObject("players").let { players ->
             data.getJSONObject("motd").getJSONArray("clean").let { motd ->
-                APIResult("Online", players.getInt("online"), players.getInt("max"), motd.joinToString(" "))
+                APIResult("Online", players.getInt("online"), players.getInt("max"), motd.joinToString("\n"))
             }
         }
     }

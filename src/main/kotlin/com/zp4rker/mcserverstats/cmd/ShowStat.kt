@@ -64,15 +64,18 @@ object ShowStat : Command(aliases = arrayOf("showstat"), usage = "showstat <ip> 
         val m = channel.sendMessage(embed {
             title { text = "Where should this stat be displayed?" }
             description = """
-                React with :one: for it to be displayed in the topic of this channel.
-                React with :two: for it to be displayed as a channel name.
+                React with 1️⃣ for it to be displayed in the topic of this channel.
+                React with 2️⃣ for it to be displayed as a channel name.
             """.trimIndent()
         }).complete()
+        m.addReaction("1️⃣").queue()
+        m.addReaction("2️⃣".unicodify()).queue()
+
         val r = channel.awaitReactions({
             it.retrieveUsers().complete().any { u -> u == message.author } && it.messageId == m.id &&
-                    (it.reactionEmote.name == ":one:".unicodify() || it.reactionEmote.name == ":two:".unicodify())
+                    (it.reactionEmote.name == "1️⃣" || it.reactionEmote.name == "2️⃣")
         }).first()
-        val topic = r.reactionEmote.name == ":one:".unicodify()
+        val topic = r.reactionEmote.name == "1️⃣"
 
         // prepare location
         if (topic) {

@@ -13,3 +13,4 @@ gradle.properties
 # project #
 logs/
 config.yml
+serverStats.db

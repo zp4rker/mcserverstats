@@ -1,13 +1,18 @@
 package com.zp4rker.mcserverstats
 
 import com.zp4rker.discore.API
+import com.zp4rker.discore.LOGGER
 import com.zp4rker.discore.bot
+import com.zp4rker.discore.extenstions.event.expect
+import com.zp4rker.discore.extenstions.event.on
 import com.zp4rker.discore.storage.BotConfig
 import com.zp4rker.discore.util.loadYamlOrDefault
+import com.zp4rker.mcserverstats.cmd.ShowStat
 import com.zp4rker.mcserverstats.data.ServerStat
 import net.dv8tion.jda.api.entities.Activity
 import net.dv8tion.jda.api.entities.TextChannel
 import net.dv8tion.jda.api.entities.VoiceChannel
+import net.dv8tion.jda.api.events.ReadyEvent
 import org.mapdb.DBMaker
 import org.mapdb.Serializer
 import java.io.File
@@ -33,22 +38,27 @@ fun main() {
 
         activity = Activity.watching("lots of Minecraft servers...")
 
-        quit = { db.close() }
+        commands = listOf(ShowStat)
+
+        quit = { db.commit(); db.close() }
     }
 
-    fixedRateTimer(period = TimeUnit.SECONDS.toMillis(30)) {
-        channels.forEach { (id, stat) ->
-            async.submit {
-                val channel = API.getGuildChannelById(id) ?: run {
-                    channels.remove(id)
-                    return@submit
-                }
+    API.expect<ReadyEvent> {
+        fixedRateTimer(period = TimeUnit.SECONDS.toMillis(30)) {
+            LOGGER.debug("${channels.size} - ${channels.keys.joinToString()}")
+            channels.forEach { (id, stat) ->
+                async.submit {
+                    val channel = API.getGuildChannelById(id) ?: run {
+                        channels.remove(id)
+                        return@submit
+                    }
 
-                stat.getStat().let {
-                    if (channel is TextChannel) {
-                        if (channel.topic != it) channel.manager.setTopic(it).queue()
-                    } else if (channel is VoiceChannel) {
-                        if (channel.name != it) channel.manager.setName(it.take(32)).queue()
+                    stat.getStat().let { stat ->
+                        if (channel is TextChannel) {
+                            if (channel.topic != stat) channel.manager.setTopic(stat).queue()
+                        } else if (channel is VoiceChannel) {
+                            if (channel.name != stat) channel.manager.setName(stat.let { if (it.length > 32) "${it.take(29)}..." else it }).queue()
+                        }
                     }
                 }
             }

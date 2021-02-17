@@ -35,7 +35,7 @@ data class ServerStat(val serverIP: String, val type: Type) {
             Type.Status -> "Server status: ${data.status}"
             Type.OnlinePlayers -> "Online players: ${data.onlinePlayers ?: "Unavailable"}"
             Type.MaxPlayers -> "Max players: ${data.maxPlayers ?: "Unavailable"}"
-            else -> "Server motd: ${data.motd ?: "Unavailable"}"
+            else -> (data.motd ?: "Unavailable")
         }
     }
 
