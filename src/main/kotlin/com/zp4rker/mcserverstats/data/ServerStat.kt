@@ -29,11 +29,13 @@ data class ServerStat(val serverIP: String, val type: Type) {
     }
 
     fun getStat(): String {
+        val data = API.retrieve(serverIP)
+
         return when (type) {
-            Type.Status -> "Server status: Online"
-            Type.OnlinePlayers -> "Online players: 30"
-            Type.MaxPlayers -> "Max players: 250"
-            else -> "Server motd: A Minecraft Server"
+            Type.Status -> "Server status: ${data.status}"
+            Type.OnlinePlayers -> "Online players: ${data.onlinePlayers ?: "Unavailable"}"
+            Type.MaxPlayers -> "Max players: ${data.maxPlayers ?: "Unavailable"}"
+            else -> "Server motd: ${data.motd ?: "Unavailable"}"
         }
     }
 

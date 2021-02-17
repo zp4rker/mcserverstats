@@ -48,7 +48,7 @@ fun main() {
                     if (channel is TextChannel) {
                         if (channel.topic != it) channel.manager.setTopic(it).queue()
                     } else if (channel is VoiceChannel) {
-                        if (channel.name != it) channel.manager.setName(it).queue()
+                        if (channel.name != it) channel.manager.setName(it.take(32)).queue()
                     }
                 }
             }
